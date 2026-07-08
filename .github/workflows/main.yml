@@ -1,0 +1,33 @@
+name: update
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 0 1/7 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+        cache: 'pip'
+
+    - run: pip install -r requirements.txt
+
+    - run: |
+        git reset HEAD^
+        python main.py
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git commit -a -m "github-actions[bot]"
+        git push -f
